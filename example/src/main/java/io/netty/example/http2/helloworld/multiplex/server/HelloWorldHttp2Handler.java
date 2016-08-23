@@ -64,7 +64,7 @@ public class HelloWorldHttp2Handler extends ChannelDuplexHandler {
      * If receive a frame with end-of-stream set, send a pre-canned response.
      */
     public void onDataRead(ChannelHandlerContext ctx, Http2DataFrame data) throws Exception {
-        if (data.isEndStream()) {
+        if (data.endStream()) {
             sendResponse(ctx, data.content());
         } else {
             // We do not send back the response to the remote-peer, so we need to release it.
@@ -77,7 +77,7 @@ public class HelloWorldHttp2Handler extends ChannelDuplexHandler {
      */
     public void onHeadersRead(ChannelHandlerContext ctx, Http2HeadersFrame headers)
             throws Exception {
-        if (headers.isEndStream()) {
+        if (headers.endStream()) {
             ByteBuf content = ctx.alloc().buffer();
             content.writeBytes(RESPONSE_BYTES.duplicate());
             ByteBufUtil.writeAscii(content, " - via HTTP/2");
