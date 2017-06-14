@@ -1119,8 +1119,10 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
         flushIfNeeded(ctx);
         readIfNeeded(ctx);
 
-        firedChannelRead = false;
-        ctx.fireChannelReadComplete();
+        if (firedChannelRead) {
+            firedChannelRead = false;
+            ctx.fireChannelReadComplete();
+        }
     }
 
     private void readIfNeeded(ChannelHandlerContext ctx) {
