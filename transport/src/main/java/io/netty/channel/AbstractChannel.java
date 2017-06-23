@@ -607,6 +607,10 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             close(promise, CLOSE_CLOSED_CHANNEL_EXCEPTION, CLOSE_CLOSED_CHANNEL_EXCEPTION, false);
         }
 
+        protected void afterClose() {
+            // NOOP
+        }
+
         private void close(final ChannelPromise promise, final Throwable cause,
                            final ClosedChannelException closeCause, final boolean notify) {
             if (!promise.setUncancellable()) {
@@ -678,6 +682,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                     fireChannelInactiveAndDeregister(wasActive);
                 }
             }
+            afterClose();
         }
 
         private void doClose0(ChannelPromise promise) {

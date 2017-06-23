@@ -697,6 +697,13 @@ public class EmbeddedChannel extends AbstractChannel {
         public void connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
             safeSetSuccess(promise);
         }
+
+        @Override
+        protected void afterClose() {
+            // Ensure we run all pending tasks when the channel is closed.
+            // See https://github.com/netty/netty/issues/6894
+            runPendingTasks();
+        }
     }
 
     private final class EmbeddedChannelPipeline extends DefaultChannelPipeline {
