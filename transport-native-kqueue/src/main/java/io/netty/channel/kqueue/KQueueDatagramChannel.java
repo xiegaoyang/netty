@@ -30,11 +30,11 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.unix.DatagramSocketAddress;
 import io.netty.channel.unix.IovArray;
 import io.netty.channel.unix.UnixChannelUtil;
-import io.netty.util.internal.PlatformDependent;
 import io.netty.util.internal.StringUtil;
 import io.netty.util.internal.UnstableApi;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -334,7 +334,7 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
 
         if (remoteAddress == null) {
             remoteAddress = remote;
-            if (remoteAddress == null) {
+            if (remoteAddress == null || !isConnected()) {
                 throw new NotYetConnectedException();
             }
         }
@@ -399,7 +399,18 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
 
     @Override
     protected void doDisconnect() throws Exception {
+        InetSocketAddress address = remoteAddress();
+        socket.disconnect();
         connected = false;
+        if (address != null) {
+            active = false;
+        }
+    }
+
+    @Override
+    protected void doClose() throws Exception {
+        connected = false;
+        super.doClose();
     }
 
     final class KQueueDatagramChannelUnsafe extends AbstractKQueueUnsafe {
@@ -422,6 +433,10 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
                     KQueueDatagramChannel.this.local = socket.localAddress();
                     success = true;
 
+                    // Need to be set before we notify the promise and fire through the pipeline.
+                    active = true;
+                    connected = true;
+
                     // First notify the promise before notifying the handler.
                     channelPromise.trySuccess();
 
@@ -433,8 +448,6 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
                 } finally {
                     if (!success) {
                         doClose();
-                    } else {
-                        connected = true;
                     }
                 }
             } catch (Throwable cause) {

@@ -423,7 +423,7 @@ static jint netty_unix_socket_disconnect(JNIEnv* env, jclass clazz, jint fd) {
         len = sizeof(struct sockaddr_in6);
     } else {
         struct sockaddr_in* ipaddr = (struct sockaddr_in*) &addr;
-        ipaddr->sin_family = AF_INET;
+        ipaddr->sin_family = AF_UNSPEC;
         len = sizeof(struct sockaddr_in);
     }
 
@@ -433,7 +433,9 @@ static jint netty_unix_socket_disconnect(JNIEnv* env, jclass clazz, jint fd) {
         res = connect(fd, (struct sockaddr*) &addr, len);
     } while (res == -1 && ((err = errno) == EINTR));
 
-    if (res < 0) {
+    // EAFNOSUPPORT is harmless in this case.
+    // See http://www.unix.com/man-page/osx/2/connect/
+    if (res < 0 && err != EAFNOSUPPORT) {
         return -err;
     }
     return 0;
