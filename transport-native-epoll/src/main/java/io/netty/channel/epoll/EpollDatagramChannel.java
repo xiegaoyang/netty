@@ -110,8 +110,7 @@ public final class EpollDatagramChannel extends AbstractEpollChannel implements 
         try {
             return joinGroup(
                     multicastAddress,
-                    NetworkInterface.getByInetAddress(localAddress().getAddress()),
-                    null, promise);
+                    NetworkInterface.getByInetAddress(localAddress().getAddress()), null, promise);
         } catch (SocketException e) {
             promise.setFailure(e);
         }
@@ -356,11 +355,10 @@ public final class EpollDatagramChannel extends AbstractEpollChannel implements 
             assert cnt != 0;
 
             if (remoteAddress == null) {
-                writtenBytes = socket.writevAddresses(array.memoryAddress(0),
-                        cnt);
+                writtenBytes = socket.writevAddresses(array.memoryAddress(0), cnt);
             } else {
-                writtenBytes = socket.sendToAddresses(array.memoryAddress(0),
-                        cnt, remoteAddress.getAddress(), remoteAddress.getPort());
+                writtenBytes = socket.sendToAddresses(array.memoryAddress(0), cnt,
+                        remoteAddress.getAddress(), remoteAddress.getPort());
             }
         } else  {
             ByteBuffer nioData = data.internalNioBuffer(data.readerIndex(), data.readableBytes());

@@ -733,6 +733,11 @@ public abstract class AbstractEpollStreamChannel extends AbstractEpollChannel im
         }
 
         @Override
+        EpollRecvByteAllocatorHandle newEpollHandle(RecvByteBufAllocator.ExtendedHandle handle) {
+            return new EpollRecvByteAllocatorStreamingHandle(handle);
+        }
+
+        @Override
         void epollInReady() {
             final ChannelConfig config = config();
             if (shouldBreakEpollInReady(config)) {

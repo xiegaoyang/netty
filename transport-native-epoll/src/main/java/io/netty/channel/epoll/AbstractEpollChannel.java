@@ -520,7 +520,7 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
         /**
          * Called once a EPOLLOUT event is ready to be processed
          */
-        void epollOutReady() {
+        final void epollOutReady() {
             if (connectPromise != null) {
                 // pending connect which is now complete so handle it.
                 finishConnect();
@@ -668,7 +668,7 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
         /**
          * Finish the connect
          */
-        boolean doFinishConnect() throws Exception {
+        private boolean doFinishConnect() throws Exception {
             if (socket.finishConnect()) {
                 clearFlag(Native.EPOLLOUT);
                 if (requestedRemoteAddress instanceof InetSocketAddress) {
@@ -677,10 +677,9 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
                 requestedRemoteAddress = null;
 
                 return true;
-            } else {
-                setFlag(Native.EPOLLOUT);
-                return false;
             }
+            setFlag(Native.EPOLLOUT);
+            return false;
         }
     }
 
