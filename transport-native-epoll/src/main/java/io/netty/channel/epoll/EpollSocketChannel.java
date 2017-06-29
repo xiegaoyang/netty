@@ -41,7 +41,8 @@ public final class EpollSocketChannel extends AbstractEpollStreamChannel impleme
 
     private volatile Collection<InetAddress> tcpMd5SigAddresses = Collections.emptyList();
 
-    EpollSocketChannel(Channel parent, LinuxSocket fd, InetSocketAddress remote) {
+    // TODO: What to do with remoteAddress ?
+    EpollSocketChannel(Channel parent, LinuxSocket fd, InetSocketAddress remoteAddress) {
         super(parent, fd);
         config = new EpollSocketChannelConfig(this);
 

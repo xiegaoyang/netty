@@ -88,13 +88,11 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
         readFlag = flag;
         flags |= flag;
         this.active = active;
-        if (remote != null) {
+        if (active) {
             // Directly cache the remote and local addresses
             // See https://github.com/netty/netty/issues/2359
-            this.remote = remote;
-        }
-        if (active) {
             local = fd.localAddress();
+            remote = fd.remoteAddress();
         }
     }
 

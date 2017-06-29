@@ -55,8 +55,6 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
                     StringUtil.simpleClassName(InetSocketAddress.class) + ">, " +
                     StringUtil.simpleClassName(ByteBuf.class) + ')';
 
-    private volatile InetSocketAddress local;
-    private volatile InetSocketAddress remote;
     private volatile boolean connected;
     private final KQueueDatagramChannelConfig config;
 
@@ -72,9 +70,6 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
     KQueueDatagramChannel(BsdSocket socket, boolean active) {
         super(null, socket, active);
         config = new KQueueDatagramChannelConfig(this);
-        // As we create an EpollDatagramChannel from a FileDescriptor we should try to obtain the remote and local
-        // address from it. This is needed as the FileDescriptor may be bound already.
-        local = socket.localAddress();
     }
 
     @Override
@@ -258,21 +253,8 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
     }
 
     @Override
-    protected InetSocketAddress localAddress0() {
-        return local;
-    }
-
-    @Override
-    protected InetSocketAddress remoteAddress0() {
-        return remote;
-    }
-
-    @Override
     protected void doBind(SocketAddress localAddress) throws Exception {
-        InetSocketAddress addr = (InetSocketAddress) localAddress;
-        checkResolvable(addr);
-        socket.bind(addr);
-        local = socket.localAddress();
+        super.doBind(localAddress);
         active = true;
     }
 
@@ -411,52 +393,22 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
     }
 
     @Override
+    protected boolean doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+        if (super.doConnect(remoteAddress, localAddress)) {
+            connected = true;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     protected void doClose() throws Exception {
-        connected = false;
         super.doClose();
+        connected = false;
     }
 
     final class KQueueDatagramChannelUnsafe extends AbstractKQueueUnsafe {
         private final List<Object> readBuf = new ArrayList<Object>();
-
-        @Override
-        public void connect(SocketAddress remote, SocketAddress local, ChannelPromise channelPromise) {
-            boolean success = false;
-            try {
-                try {
-                    boolean wasActive = isActive();
-                    InetSocketAddress remoteAddress = (InetSocketAddress) remote;
-                    if (local != null) {
-                        InetSocketAddress localAddress = (InetSocketAddress) local;
-                        doBind(localAddress);
-                    }
-
-                    checkResolvable(remoteAddress);
-                    KQueueDatagramChannel.this.remote = remoteAddress;
-                    KQueueDatagramChannel.this.local = socket.localAddress();
-                    success = true;
-
-                    // Need to be set before we notify the promise and fire through the pipeline.
-                    active = true;
-                    connected = true;
-
-                    // First notify the promise before notifying the handler.
-                    channelPromise.trySuccess();
-
-                    // Regardless if the connection attempt was cancelled, channelActive() event should be triggered,
-                    // because what happened is what happened.
-                    if (!wasActive && isActive()) {
-                        pipeline().fireChannelActive();
-                    }
-                } finally {
-                    if (!success) {
-                        doClose();
-                    }
-                }
-            } catch (Throwable cause) {
-                channelPromise.tryFailure(cause);
-            }
-        }
 
         @Override
         void readReady(KQueueRecvByteAllocatorHandle allocHandle) {
