@@ -639,7 +639,7 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
             }
         }
 
-        boolean doFinishConnect() throws Exception {
+        private boolean doFinishConnect() throws Exception {
             if (socket.finishConnect()) {
                 writeFilter(false);
                 if (requestedRemoteAddress instanceof InetSocketAddress) {
@@ -652,6 +652,15 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
                 return false;
             }
         }
+    }
+
+    @Override
+    protected void doBind(SocketAddress local) throws Exception {
+        if (local instanceof InetSocketAddress) {
+            checkResolvable((InetSocketAddress) local);
+        }
+        socket.bind(local);
+        this.local = socket.localAddress();
     }
 
     /**
@@ -705,15 +714,6 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
                 doClose();
             }
         }
-    }
-
-    @Override
-    protected void doBind(SocketAddress local) throws Exception {
-        if (local instanceof InetSocketAddress) {
-            checkResolvable((InetSocketAddress) local);
-        }
-        socket.bind(local);
-        this.local = socket.localAddress();
     }
 
     @Override

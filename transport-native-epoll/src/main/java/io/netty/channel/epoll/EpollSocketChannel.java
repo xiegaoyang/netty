@@ -41,15 +41,6 @@ public final class EpollSocketChannel extends AbstractEpollStreamChannel impleme
 
     private volatile Collection<InetAddress> tcpMd5SigAddresses = Collections.emptyList();
 
-    EpollSocketChannel(Channel parent, LinuxSocket fd, InetSocketAddress remoteAddress) {
-        super(parent, fd, remoteAddress);
-        config = new EpollSocketChannelConfig(this);
-
-        if (parent instanceof EpollServerSocketChannel) {
-            tcpMd5SigAddresses = ((EpollServerSocketChannel) parent).tcpMd5SigAddresses();
-        }
-    }
-
     public EpollSocketChannel() {
         super(newSocketStream(), false);
         config = new EpollSocketChannelConfig(this);
@@ -63,6 +54,15 @@ public final class EpollSocketChannel extends AbstractEpollStreamChannel impleme
     EpollSocketChannel(LinuxSocket fd, boolean active) {
         super(fd, active);
         config = new EpollSocketChannelConfig(this);
+    }
+
+    EpollSocketChannel(Channel parent, LinuxSocket fd, InetSocketAddress remoteAddress) {
+        super(parent, fd, remoteAddress);
+        config = new EpollSocketChannelConfig(this);
+
+        if (parent instanceof EpollServerSocketChannel) {
+            tcpMd5SigAddresses = ((EpollServerSocketChannel) parent).tcpMd5SigAddresses();
+        }
     }
 
     /**
@@ -134,6 +134,6 @@ public final class EpollSocketChannel extends AbstractEpollStreamChannel impleme
     }
 
     void setTcpMd5Sig(Map<InetAddress, byte[]> keys) throws IOException {
-        this.tcpMd5SigAddresses = TcpMd5Util.newTcpMd5Sigs(this, tcpMd5SigAddresses, keys);
+        tcpMd5SigAddresses = TcpMd5Util.newTcpMd5Sigs(this, tcpMd5SigAddresses, keys);
     }
 }
