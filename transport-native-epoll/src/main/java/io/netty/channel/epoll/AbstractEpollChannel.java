@@ -96,6 +96,18 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
         }
     }
 
+    AbstractEpollChannel(Channel parent, LinuxSocket fd, int flag, SocketAddress remote) {
+        super(parent);
+        socket = checkNotNull(fd, "fd");
+        readFlag = flag;
+        flags |= flag;
+        active = true;
+        // Directly cache the remote and local addresses
+        // See https://github.com/netty/netty/issues/2359
+        this.remote = remote;
+        local = fd.localAddress();
+    }
+
     static boolean isSoErrorZero(Socket fd) {
         try {
             return fd.getSoError() == 0;

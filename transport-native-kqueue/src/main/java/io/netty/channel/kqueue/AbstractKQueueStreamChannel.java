@@ -36,6 +36,7 @@ import io.netty.util.internal.StringUtil;
 import io.netty.util.internal.UnstableApi;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.Executor;
@@ -51,6 +52,10 @@ public abstract class AbstractKQueueStreamChannel extends AbstractKQueueChannel 
 
     AbstractKQueueStreamChannel(Channel parent, BsdSocket fd, boolean active) {
         super(parent, fd, active, true);
+    }
+
+    AbstractKQueueStreamChannel(Channel parent, BsdSocket fd, SocketAddress remote) {
+        super(parent, fd, remote);
     }
 
     AbstractKQueueStreamChannel(BsdSocket fd) {

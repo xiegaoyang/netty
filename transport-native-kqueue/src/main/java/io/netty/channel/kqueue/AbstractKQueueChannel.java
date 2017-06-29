@@ -89,13 +89,22 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
         socket = checkNotNull(fd, "fd");
         this.active = active;
         this.writeFilterEnabled = writeFilterEnabled;
-        this.active = active;
         if (active) {
             // Directly cache the remote and local addresses
             // See https://github.com/netty/netty/issues/2359
             local = fd.localAddress();
             remote = fd.remoteAddress();
         }
+    }
+
+    AbstractKQueueChannel(Channel parent, BsdSocket fd, SocketAddress remote) {
+        super(parent);
+        socket = checkNotNull(fd, "fd");
+        active = true;
+        // Directly cache the remote and local addresses
+        // See https://github.com/netty/netty/issues/2359
+        this.remote = remote;
+        local = fd.localAddress();
     }
 
     static boolean isSoErrorZero(BsdSocket fd) {

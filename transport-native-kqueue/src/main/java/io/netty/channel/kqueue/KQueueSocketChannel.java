@@ -38,9 +38,8 @@ public final class KQueueSocketChannel extends AbstractKQueueStreamChannel imple
         config = new KQueueSocketChannelConfig(this);
     }
 
-    // TODO: What to do with remoteAddress ?
     KQueueSocketChannel(Channel parent, BsdSocket fd, InetSocketAddress remoteAddress) {
-        super(parent, fd, true);
+        super(parent, fd, remoteAddress);
         config = new KQueueSocketChannelConfig(this);
     }
 

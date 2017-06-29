@@ -41,6 +41,7 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
@@ -88,6 +89,12 @@ public abstract class AbstractEpollStreamChannel extends AbstractEpollChannel im
 
     AbstractEpollStreamChannel(Channel parent, LinuxSocket fd) {
         super(parent, fd, Native.EPOLLIN, true);
+        // Add EPOLLRDHUP so we are notified once the remote peer close the connection.
+        flags |= Native.EPOLLRDHUP;
+    }
+
+    AbstractEpollStreamChannel(Channel parent, LinuxSocket fd, SocketAddress remote) {
+        super(parent, fd, Native.EPOLLIN, remote);
         // Add EPOLLRDHUP so we are notified once the remote peer close the connection.
         flags |= Native.EPOLLRDHUP;
     }
