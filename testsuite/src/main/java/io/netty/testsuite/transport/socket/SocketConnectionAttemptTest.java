@@ -113,7 +113,7 @@ public class SocketConnectionAttemptTest extends AbstractClientSocketTest {
             }
         }
 
-        assumeThat("The connection attempt to " + SocketTestPermutation.BAD_HOST + " does not time out.",
+        assumeThat("The connection attempt to " + BAD_HOST + " does not time out.",
                 badHostTimedOut, is(true));
 
         run();
