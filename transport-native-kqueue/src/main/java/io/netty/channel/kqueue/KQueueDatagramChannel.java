@@ -34,14 +34,12 @@ import io.netty.util.internal.StringUtil;
 import io.netty.util.internal.UnstableApi;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -332,30 +330,35 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
             return true;
         }
 
-        if (remoteAddress == null) {
-            remoteAddress = remote;
-            if (remoteAddress == null || !isConnected()) {
-                throw new NotYetConnectedException();
-            }
-        }
-
-        final int writtenBytes;
+        final long writtenBytes;
         if (data.hasMemoryAddress()) {
             long memoryAddress = data.memoryAddress();
-            writtenBytes = socket.sendToAddress(memoryAddress, data.readerIndex(), data.writerIndex(),
-                    remoteAddress.getAddress(), remoteAddress.getPort());
+            if (remoteAddress == null) {
+                writtenBytes = socket.writeAddress(memoryAddress, data.readerIndex(), data.writerIndex());
+            } else {
+                writtenBytes = socket.sendToAddress(memoryAddress, data.readerIndex(), data.writerIndex(),
+                        remoteAddress.getAddress(), remoteAddress.getPort());
+            }
         } else if (data.nioBufferCount() > 1) {
             IovArray array = ((KQueueEventLoop) eventLoop()).cleanArray();
             array.add(data);
             int cnt = array.count();
             assert cnt != 0;
 
-            writtenBytes = socket.sendToAddresses(array.memoryAddress(0),
-                    cnt, remoteAddress.getAddress(), remoteAddress.getPort());
+            if (remoteAddress == null) {
+                writtenBytes = socket.writevAddresses(array.memoryAddress(0), cnt);
+            } else {
+                writtenBytes = socket.sendToAddresses(array.memoryAddress(0), cnt,
+                        remoteAddress.getAddress(), remoteAddress.getPort());
+            }
         } else  {
             ByteBuffer nioData = data.internalNioBuffer(data.readerIndex(), data.readableBytes());
-            writtenBytes = socket.sendTo(nioData, nioData.position(), nioData.limit(),
-                    remoteAddress.getAddress(), remoteAddress.getPort());
+            if (remoteAddress == null) {
+                writtenBytes = socket.write(nioData, nioData.position(), nioData.limit());
+            } else {
+                writtenBytes = socket.sendTo(nioData, nioData.position(), nioData.limit(),
+                        remoteAddress.getAddress(), remoteAddress.getPort());
+            }
         }
 
         return writtenBytes > 0;
