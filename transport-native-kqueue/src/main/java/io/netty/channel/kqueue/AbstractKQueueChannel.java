@@ -35,13 +35,10 @@ import io.netty.channel.socket.ChannelInputShutdownReadComplete;
 import io.netty.channel.unix.FileDescriptor;
 import io.netty.channel.unix.UnixChannel;
 import io.netty.util.ReferenceCountUtil;
-import io.netty.util.internal.PlatformDependent;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AlreadyConnectedException;
 import java.nio.channels.ConnectionPendingException;
@@ -50,6 +47,7 @@ import java.nio.channels.UnresolvedAddressException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static io.netty.channel.unix.UnixChannelUtil.computeRemoteAddr;
 import static io.netty.util.internal.ObjectUtil.checkNotNull;
 
 abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChannel {
@@ -726,24 +724,5 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
     @Override
     protected SocketAddress remoteAddress0() {
         return remote;
-    }
-
-    private static InetSocketAddress computeRemoteAddr(InetSocketAddress remoteAddr, InetSocketAddress osRemoteAddr) {
-        if (osRemoteAddr != null) {
-            if (PlatformDependent.javaVersion() >= 7) {
-                try {
-                    // Only try to construct a new InetSocketAddress if we using java >= 7 as getHostString() does not
-                    // exists in earlier releases and so the retrieval of the hostname could block the EventLoop if a
-                    // reverse lookup would be needed.
-                    return new InetSocketAddress(InetAddress.getByAddress(remoteAddr.getHostString(),
-                            osRemoteAddr.getAddress().getAddress()),
-                            osRemoteAddr.getPort());
-                } catch (UnknownHostException ignore) {
-                    // Should never happen but fallback to osRemoteAddr anyway.
-                }
-            }
-            return osRemoteAddr;
-        }
-        return remoteAddr;
     }
 }
