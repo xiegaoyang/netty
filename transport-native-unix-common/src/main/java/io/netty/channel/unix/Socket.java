@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 
 import static io.netty.channel.unix.Errors.ERRNO_EAGAIN_NEGATIVE;
+import static io.netty.channel.unix.Errors.ERROR_ECONNREFUSED_NEGATIVE;
 import static io.netty.channel.unix.Errors.ERRNO_EINPROGRESS_NEGATIVE;
 import static io.netty.channel.unix.Errors.ERRNO_EWOULDBLOCK_NEGATIVE;
 import static io.netty.channel.unix.Errors.ioResult;
@@ -142,7 +143,7 @@ public class Socket extends FileDescriptor {
         if (res >= 0) {
             return res;
         }
-        if (res == Errors.ERROR_ECONNREFUSED_NEGATIVE) {
+        if (res == ERROR_ECONNREFUSED_NEGATIVE) {
             throw new PortUnreachableException("sendto failed");
         }
         return ioResult("sendTo", res, SEND_TO_CONNECTION_RESET_EXCEPTION, SEND_TO_CLOSED_CHANNEL_EXCEPTION);
@@ -166,7 +167,7 @@ public class Socket extends FileDescriptor {
         if (res >= 0) {
             return res;
         }
-        if (res == Errors.ERROR_ECONNREFUSED_NEGATIVE) {
+        if (res == ERROR_ECONNREFUSED_NEGATIVE) {
             throw new PortUnreachableException("sendto failed");
         }
         return ioResult("sendToAddress", res,
@@ -191,7 +192,7 @@ public class Socket extends FileDescriptor {
             return res;
         }
 
-        if (res == Errors.ERROR_ECONNREFUSED_NEGATIVE) {
+        if (res == ERROR_ECONNREFUSED_NEGATIVE) {
             throw new PortUnreachableException("sendto failed");
         }
         return ioResult("sendToAddresses", res,
@@ -268,16 +269,11 @@ public class Socket extends FileDescriptor {
         return true;
     }
 
-    public final boolean disconnect() throws IOException {
+    public final void disconnect() throws IOException {
         int res = disconnect(fd);
         if (res < 0) {
-            if (res == ERRNO_EINPROGRESS_NEGATIVE) {
-                // connect still in progress
-                return false;
-            }
             throwConnectException("disconnect", FINISH_CONNECT_REFUSED_EXCEPTION, res);
         }
-        return true;
     }
 
     public final void bind(SocketAddress socketAddress) throws IOException {

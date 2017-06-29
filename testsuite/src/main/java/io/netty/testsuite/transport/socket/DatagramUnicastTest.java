@@ -198,6 +198,7 @@ public class DatagramUnicastTest extends AbstractDatagramTest {
         }
         assertTrue(buf.release());
     }
+
     private void testSimpleSendWithConnect0(Bootstrap sb, Bootstrap cb, ByteBuf buf, final byte[] bytes, int count,
                                             WrapType wrapType) throws Throwable {
         cb.handler(new SimpleChannelInboundHandler<Object>() {
