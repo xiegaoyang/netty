@@ -532,10 +532,7 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
             if (connectPromise != null) {
                 // pending connect which is now complete so handle it.
                 finishConnect();
-            } else {
-                if (socket.isOutputShutdown()) {
-                    return;
-                }
+            } else if (!socket.isOutputShutdown()) {
                 // directly call super.flush0() to force a flush now
                 super.flush0();
             }

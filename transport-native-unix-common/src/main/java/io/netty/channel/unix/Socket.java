@@ -144,7 +144,7 @@ public class Socket extends FileDescriptor {
             return res;
         }
         if (res == ERROR_ECONNREFUSED_NEGATIVE) {
-            throw new PortUnreachableException("sendto failed");
+            throw new PortUnreachableException("sendTo failed");
         }
         return ioResult("sendTo", res, SEND_TO_CONNECTION_RESET_EXCEPTION, SEND_TO_CLOSED_CHANNEL_EXCEPTION);
     }
@@ -168,7 +168,7 @@ public class Socket extends FileDescriptor {
             return res;
         }
         if (res == ERROR_ECONNREFUSED_NEGATIVE) {
-            throw new PortUnreachableException("sendto failed");
+            throw new PortUnreachableException("sendToAddress failed");
         }
         return ioResult("sendToAddress", res,
                 SEND_TO_ADDRESS_CONNECTION_RESET_EXCEPTION, SEND_TO_ADDRESS_CLOSED_CHANNEL_EXCEPTION);
@@ -193,7 +193,7 @@ public class Socket extends FileDescriptor {
         }
 
         if (res == ERROR_ECONNREFUSED_NEGATIVE) {
-            throw new PortUnreachableException("sendto failed");
+            throw new PortUnreachableException("sendToAddresses failed");
         }
         return ioResult("sendToAddresses", res,
                 CONNECTION_RESET_EXCEPTION_SENDMSG, SEND_TO_ADDRESSES_CLOSED_CHANNEL_EXCEPTION);

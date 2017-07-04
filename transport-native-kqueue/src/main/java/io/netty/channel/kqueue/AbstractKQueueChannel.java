@@ -433,10 +433,7 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
             if (connectPromise != null) {
                 // pending connect which is now complete so handle it.
                 finishConnect();
-            } else {
-                if (socket.isOutputShutdown()) {
-                    return;
-                }
+            } else if (!socket.isOutputShutdown()) {
                 // directly call super.flush0() to force a flush now
                 super.flush0();
             }
@@ -647,10 +644,9 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
                 }
                 requestedRemoteAddress = null;
                 return true;
-            } else {
-                writeFilter(true);
-                return false;
             }
+            writeFilter(true);
+            return false;
         }
     }
 
