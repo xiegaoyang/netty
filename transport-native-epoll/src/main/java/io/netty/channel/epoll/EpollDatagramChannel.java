@@ -411,12 +411,8 @@ public final class EpollDatagramChannel extends AbstractEpollChannel implements 
 
     @Override
     protected void doDisconnect() throws Exception {
-        InetSocketAddress address = remoteAddress();
         socket.disconnect();
-        connected = false;
-        if (address != null) {
-            active = false;
-        }
+        connected = active = false;
     }
 
     @Override

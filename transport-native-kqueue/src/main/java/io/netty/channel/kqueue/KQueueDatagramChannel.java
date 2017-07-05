@@ -384,12 +384,8 @@ public final class KQueueDatagramChannel extends AbstractKQueueChannel implement
 
     @Override
     protected void doDisconnect() throws Exception {
-        InetSocketAddress address = remoteAddress();
         socket.disconnect();
-        connected = false;
-        if (address != null) {
-            active = false;
-        }
+        connected = active = false;
     }
 
     @Override

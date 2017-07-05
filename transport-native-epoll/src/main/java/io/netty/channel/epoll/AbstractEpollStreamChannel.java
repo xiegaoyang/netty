@@ -75,7 +75,6 @@ public abstract class AbstractEpollStreamChannel extends AbstractEpollChannel im
 
     private WritableByteChannel byteChannel;
 
-    @Deprecated
     protected AbstractEpollStreamChannel(Channel parent, int fd) {
         this(parent, new LinuxSocket(fd));
     }
