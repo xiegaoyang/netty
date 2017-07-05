@@ -429,7 +429,7 @@ abstract class AbstractKQueueChannel extends AbstractChannel implements UnixChan
             }
         }
 
-        void writeReady() {
+        final void writeReady() {
             if (connectPromise != null) {
                 // pending connect which is now complete so handle it.
                 finishConnect();
