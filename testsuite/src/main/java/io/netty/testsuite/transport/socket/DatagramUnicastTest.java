@@ -167,10 +167,10 @@ public class DatagramUnicastTest extends AbstractDatagramTest {
         for (int i = 0; i < count; i++) {
             switch (wrapType) {
                 case DUP:
-                    cc.write(new DatagramPacket(buf.retain().duplicate(), addr));
+                    cc.write(new DatagramPacket(buf.retainedDuplicate(), addr));
                     break;
                 case SLICE:
-                    cc.write(new DatagramPacket(buf.retain().slice(), addr));
+                    cc.write(new DatagramPacket(buf.retainedSlice(), addr));
                     break;
                 case READ_ONLY:
                     cc.write(new DatagramPacket(buf.retain().asReadOnly(), addr));
@@ -217,10 +217,10 @@ public class DatagramUnicastTest extends AbstractDatagramTest {
             for (int i = 0; i < count; i++) {
                 switch (wrapType) {
                     case DUP:
-                        cc.write(buf.retain().duplicate());
+                        cc.write(buf.retainedDuplicate());
                         break;
                     case SLICE:
-                        cc.write(buf.retain().slice());
+                        cc.write(buf.retainedSlice());
                         break;
                     case READ_ONLY:
                         cc.write(buf.retain().asReadOnly());
@@ -231,7 +231,6 @@ public class DatagramUnicastTest extends AbstractDatagramTest {
                     default:
                         throw new Error("unknown wrap type: " + wrapType);
                 }
-                cc.write(buf.retain().duplicate());
             }
             cc.flush();
             assertTrue(latch.await(10, TimeUnit.SECONDS));
