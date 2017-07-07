@@ -464,6 +464,7 @@ public final class ByteBufUtil {
 
     // Fast-Path implementation
     static int writeUtf8(AbstractByteBuf buffer, int writerIndex, CharSequence seq, int len) {
+        buffer.ensureAccessible();
         int oldWriterIndex = writerIndex;
 
         // We can use the _set methods as these not need to do any index checks and reference checks.
@@ -565,7 +566,7 @@ public final class ByteBufUtil {
 
     // Fast-Path implementation
     static int writeAscii(AbstractByteBuf buffer, int writerIndex, CharSequence seq, int len) {
-
+        buffer.ensureAccessible();
         // We can use the _set methods as these not need to do any index checks and reference checks.
         // This is possible as we called ensureWritable(...) before.
         for (int i = 0; i < len; i++) {

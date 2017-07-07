@@ -102,6 +102,54 @@ public class WrappedUnpooledUnsafeByteBufTest extends BigEndianUnsafeDirectByteB
 
     @Test(expected = IndexOutOfBoundsException.class)
     @Override
+    public void testSetUsAsciiCharSequenceAfterRelease() {
+        super.testSetUsAsciiCharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testSetIso88591CharSequenceAfterRelease() {
+        super.testSetIso88591CharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testSetUtf8CharSequenceAfterRelease() {
+        super.testSetUtf8CharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testSetUtf16CharSequenceAfterRelease() {
+        super.testSetUtf16CharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testWriteUsAsciiCharSequenceAfterRelease() {
+        super.testWriteUsAsciiCharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testWriteIso88591CharSequenceAfterRelease() {
+        super.testWriteIso88591CharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testWriteUtf8CharSequenceAfterRelease() {
+        super.testWriteUtf8CharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
+    public void testWriteUtf16CharSequenceAfterRelease() {
+        super.testWriteUtf16CharSequenceAfterRelease();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    @Override
     public void testGetReadOnlyDirectDst() {
         super.testGetReadOnlyDirectDst();
     }
